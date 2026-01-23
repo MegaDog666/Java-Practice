@@ -1,4 +1,4 @@
-package com.andreyk.practiceproject.config;
+package com.andreyk.practiceproject.core.config;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.context.ApplicationContextInitializer;

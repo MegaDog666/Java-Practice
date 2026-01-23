@@ -1,6 +1,6 @@
 package com.andreyk.practiceproject;
 
-import com.andreyk.practiceproject.config.DotenvPropertyInitializer;
+import com.andreyk.practiceproject.core.config.DotenvPropertyInitializer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

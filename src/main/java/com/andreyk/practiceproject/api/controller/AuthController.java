@@ -1,9 +1,9 @@
-package com.andreyk.practiceproject.controller;
+package com.andreyk.practiceproject.api.controller;
 
-import com.andreyk.practiceproject.dto.LoginRequest;
-import com.andreyk.practiceproject.dto.LoginResponse;
-import com.andreyk.practiceproject.dto.RefreshRequest;
-import com.andreyk.practiceproject.service.AuthService;
+import com.andreyk.practiceproject.api.dto.LoginRequest;
+import com.andreyk.practiceproject.api.dto.LoginResponse;
+import com.andreyk.practiceproject.api.dto.RefreshRequest;
+import com.andreyk.practiceproject.core.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +20,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authService.login(request));
+        return ResponseEntity.ok(authService.authenticate(request));
     }
 
     @PostMapping("/refresh")

@@ -65,7 +65,7 @@ components:
     LoginRequest:
       type: object
       properties:
-        login:
+        username:
           type: string
         password:
           type: string
@@ -73,7 +73,7 @@ components:
         - username
         - password
       example:
-        login: "admin"
+        username: "admin"
         password: "admin"
     RefreshRequest:
       type: object

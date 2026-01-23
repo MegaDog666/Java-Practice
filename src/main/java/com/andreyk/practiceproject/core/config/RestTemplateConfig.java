@@ -1,4 +1,4 @@
-package com.andreyk.practiceproject.config;
+package com.andreyk.practiceproject.core.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

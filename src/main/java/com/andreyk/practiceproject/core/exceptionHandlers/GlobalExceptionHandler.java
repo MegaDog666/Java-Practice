@@ -1,6 +1,6 @@
-package com.andreyk.practiceproject.exceptionHandlers;
+package com.andreyk.practiceproject.core.exceptionHandlers;
 
-import com.andreyk.practiceproject.dto.ErrorResponse;
+import com.andreyk.practiceproject.api.dto.ErrorResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

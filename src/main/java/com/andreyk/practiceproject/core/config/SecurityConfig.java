@@ -1,4 +1,4 @@
-package com.andreyk.practiceproject.config;
+package com.andreyk.practiceproject.core.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,8 +20,8 @@ public class SecurityConfig {
                         sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/auth/refresh").anonymous()
-                        .requestMatchers("/ping").authenticated()
+                        .requestMatchers("/auth/**").anonymous()
+                        .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
 

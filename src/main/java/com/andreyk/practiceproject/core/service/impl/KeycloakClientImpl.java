@@ -1,7 +1,8 @@
-package com.andreyk.practiceproject.service;
+package com.andreyk.practiceproject.core.service.impl;
 
-import com.andreyk.practiceproject.dto.KeycloakTokenResponse;
-import com.andreyk.practiceproject.dto.LoginResponse;
+import com.andreyk.practiceproject.api.dto.KeycloakTokenResponse;
+import com.andreyk.practiceproject.api.dto.LoginResponse;
+import com.andreyk.practiceproject.core.service.KeycloakClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -12,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor
-public class KeycloakClientService {
+public class KeycloakClientImpl implements KeycloakClient {
 
     private final RestTemplate restTemplate;
 
@@ -26,49 +27,57 @@ public class KeycloakClientService {
     private String clientSecret;
 
 
+    @Override
     public LoginResponse authenticate(String username, String password) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        HttpHeaders headers = getHttpHeaders();
 
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        extractedBaseBody(body);
         body.add("grant_type", "password");
-        body.add("client_id", clientId);
-        body.add("client_secret", clientSecret);
         body.add("username", username);
         body.add("password", password);
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
 
-        KeycloakTokenResponse token = restTemplate.exchange(
-                url,
-                HttpMethod.POST,
-                request,
-                KeycloakTokenResponse.class
-        ).getBody();
+        KeycloakTokenResponse token = getKeycloakTokenResponse(request);
 
         return mapToLoginResponse(token);
     }
 
+    @Override
     public LoginResponse refreshToken(String refreshToken) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        HttpHeaders headers = getHttpHeaders();
 
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        extractedBaseBody(body);
         body.add("grant_type", "refresh_token");
-        body.add("client_id", clientId);
-        body.add("client_secret", clientSecret);
         body.add("refresh_token", refreshToken);
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
 
-        KeycloakTokenResponse token = restTemplate.exchange(
+        KeycloakTokenResponse token = getKeycloakTokenResponse(request);
+
+        return mapToLoginResponse(token);
+    }
+
+    private void extractedBaseBody(MultiValueMap<String, String> body) {
+        body.add("client_id", clientId);
+        body.add("client_secret", clientSecret);
+    }
+
+    private HttpHeaders getHttpHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        return headers;
+    }
+
+    private KeycloakTokenResponse getKeycloakTokenResponse(HttpEntity<MultiValueMap<String, String>> request) {
+        return restTemplate.exchange(
                 url,
                 HttpMethod.POST,
                 request,
                 KeycloakTokenResponse.class
         ).getBody();
-
-        return mapToLoginResponse(token);
     }
 
     private LoginResponse mapToLoginResponse(KeycloakTokenResponse token) {
