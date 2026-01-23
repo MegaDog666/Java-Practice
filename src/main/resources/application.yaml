@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: Practice Project
+
+s3:
+  endpoint: ${S3_ENDPOINT}
+  access-key: ${S3_ACCESS_KEY}
+  secret-key: ${S3_SECRET_KEY}
+  region: ${S3_REGION}
