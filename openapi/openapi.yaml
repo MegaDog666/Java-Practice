@@ -1,0 +1,113 @@
+openapi: 3.0.3
+info:
+  title: Auth API
+  version: 1.0.0
+  description: API для аутентификации, обновления токена и тестового ping-pong
+servers:
+  - url: http://localhost:8080
+    description: Локальный сервер
+paths:
+  /auth/login:
+    post:
+      summary: Аутентификация пользователя
+      description: Возвращает access и refresh токены
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Успешная аутентификация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Пользователь с таким логином и паролем не найден
+  /auth/refresh:
+    post:
+      summary: Обновление access токена
+      description: Получает новый access token по refresh token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '200':
+          description: Токен обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Недействительный refresh token
+  /ping:
+    get:
+      summary: Ping-Pong тест
+      description: Простейший тест эндпоинт
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Ответ pong
+          content:
+            text/plain:
+              schema:
+                type: string
+        '401':
+          description: Пользователь не авторизован
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+      example:
+        login: "admin"
+        password: "admin"
+    RefreshRequest:
+      type: object
+      properties:
+        refreshToken:
+          type: string
+      required:
+        - refreshToken
+      example:
+        refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    LoginResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        tokenType:
+          type: string
+        expiresIn:
+          type: integer
+      required:
+        - accessToken
+        - refreshToken
+        - tokenType
+        - expiresIn
+      example:
+        accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        refreshToken: "dGhpc2lzYXJlZnJlc2h0b2tlbg==..."
+        tokenType: "Bearer"
+        expiresIn: 3600
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
