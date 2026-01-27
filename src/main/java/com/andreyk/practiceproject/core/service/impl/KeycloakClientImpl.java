@@ -1,7 +1,7 @@
 package com.andreyk.practiceproject.core.service.impl;
 
-import com.andreyk.practiceproject.api.dto.KeycloakTokenResponse;
-import com.andreyk.practiceproject.api.dto.LoginResponse;
+import com.andreyk.practiceproject.api.dto.auth.KeycloakTokenResponse;
+import com.andreyk.practiceproject.api.dto.auth.LoginResponse;
 import com.andreyk.practiceproject.core.service.KeycloakClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

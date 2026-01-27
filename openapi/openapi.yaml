@@ -1,14 +1,16 @@
 openapi: 3.0.3
 info:
-  title: Auth API
-  version: 1.0.0
-  description: API для аутентификации, обновления токена и тестового ping-pong
+  title: Practice Project API
+  version: 1.0.1
+  description: API для работы над хранилищем S3 Timeweb Cloud
 servers:
   - url: http://localhost:8080
     description: Локальный сервер
 paths:
   /auth/login:
     post:
+      tags:
+        - Auth
       summary: Аутентификация пользователя
       description: Возвращает access и refresh токены
       requestBody:
@@ -25,9 +27,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/LoginResponse'
         '401':
-          description: Пользователь с таким логином и паролем не найден
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /auth/refresh:
     post:
+      tags:
+        - Auth
       summary: Обновление access токена
       description: Получает новый access token по refresh token
       requestBody:
@@ -44,22 +58,209 @@ paths:
               schema:
                 $ref: '#/components/schemas/LoginResponse'
         '401':
-          description: Недействительный refresh token
-  /ping:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/storage/objects:
     get:
-      summary: Ping-Pong тест
-      description: Простейший тест эндпоинт
+      tags:
+        - Storage
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
+      summary: Получить список файлов и директорий
+      description: |
+        Возвращает плоский список файлов и директорий по указанному пути.
+        Если путь не указан — возвращается корень бакета.
+      parameters:
+        - name: path
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Путь директории
+          example: MONT/2025/
       responses:
         '200':
-          description: Ответ pong
+          description: Список объектов
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                type: array
+                items:
+                  $ref: '#/components/schemas/StorageItemDto'
         '401':
-          description: Пользователь не авторизован
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/storage/objects/filter:
+    get:
+      tags:
+        - Storage
+      security:
+        - bearerAuth: [ ]
+      summary: Фильтрация файлов и директорий
+      description: |
+        Фильтрация объектов по имени, типу и диапазону даты изменения.
+      parameters:
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Часть имени файла или директории
+          example: report
+
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [ FILE, DIRECTORY ]
+          description: Тип объекта
+
+        - name: modifiedFrom
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          example: 2026-01-01
+
+        - name: modifiedTo
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          example: 2026-01-31
+
+      responses:
+        '200':
+          description: Отфильтрованный список объектов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StorageItemDto'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/storage/object/details:
+    post:
+      tags:
+        - Storage
+      security:
+        - bearerAuth: [ ]
+      summary: Получить детальную информацию о файле или директории
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StorageObjectDetailsRequest'
+      responses:
+        '200':
+          description: Детальная информация об объекте
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorageObjectDetailsDto'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/storage/search:
+    get:
+      tags:
+        - Storage
+      security:
+        - bearerAuth: [ ]
+      summary: Поиск файла или директории
+      description: |
+        Поиск файлов и директорий по имени.
+        Поиск может быть ограничен директорией и типом объекта.
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Имя или часть имени объекта
+          example: report
+
+        - name: path
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Путь, в котором выполняется поиск
+          example: MONT/2025/
+
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [ FILE, DIRECTORY ]
+          description: Тип объекта
+
+      responses:
+        '200':
+          description: Результаты поиска
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StorageItemDto'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   schemas:
     LoginRequest:
@@ -105,6 +306,58 @@ components:
         refreshToken: "dGhpc2lzYXJlZnJlc2h0b2tlbg==..."
         tokenType: "Bearer"
         expiresIn: 3600
+    StorageItemDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: file.txt
+        path:
+          type: string
+          example: MONT/2025/file.txt
+        type:
+          type: string
+          enum: [ FILE, DIRECTORY ]
+        lastModified:
+          type: string
+          format: 2026.01.27 21:01
+    StorageObjectDetailsRequest:
+      type: object
+      required:
+        - path
+      properties:
+        path:
+          type: string
+          example: MONT/2025/file.txt
+    StorageObjectDetailsDto:
+      type: object
+      properties:
+        name:
+          type: string
+        path:
+          type: string
+        type:
+          type: string
+          enum: [ FILE, DIRECTORY ]
+        size:
+          type: integer
+          format: int64
+          example: 102400
+        lastModified:
+          type: string
+          format: date-time
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 404
+        message:
+          type: string
+          example: Object not found
+        timestamp:
+          type: string
+          format: date-time
 
   securitySchemes:
     bearerAuth:

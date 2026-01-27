@@ -1,4 +1,4 @@
-package com.andreyk.practiceproject.api.dto;
+package com.andreyk.practiceproject.api.dto.auth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

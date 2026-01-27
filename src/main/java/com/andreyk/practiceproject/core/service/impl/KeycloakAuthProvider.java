@@ -1,6 +1,6 @@
 package com.andreyk.practiceproject.core.service.impl;
 
-import com.andreyk.practiceproject.api.dto.LoginResponse;
+import com.andreyk.practiceproject.api.dto.auth.LoginResponse;
 import com.andreyk.practiceproject.core.service.AuthProvider;
 import com.andreyk.practiceproject.core.service.KeycloakClient;
 import lombok.AllArgsConstructor;

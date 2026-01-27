@@ -1,8 +1,8 @@
 package com.andreyk.practiceproject.api.controller;
 
-import com.andreyk.practiceproject.api.dto.LoginRequest;
-import com.andreyk.practiceproject.api.dto.LoginResponse;
-import com.andreyk.practiceproject.api.dto.RefreshRequest;
+import com.andreyk.practiceproject.api.dto.auth.LoginRequest;
+import com.andreyk.practiceproject.api.dto.auth.LoginResponse;
+import com.andreyk.practiceproject.api.dto.auth.RefreshRequest;
 import com.andreyk.practiceproject.core.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
