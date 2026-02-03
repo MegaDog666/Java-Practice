@@ -32,12 +32,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Invalid server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /auth/refresh:
     post:
       tags:
@@ -63,8 +76,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Invalid server
           content:
             application/json:
               schema:
@@ -103,12 +128,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Invalid server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /api/storage/objects/filter:
     get:
       tags:
@@ -166,12 +204,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Invalid server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /api/storage/object/details:
     post:
       tags:
@@ -198,12 +249,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Resource not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Invalid server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
   /api/storage/search:
     get:
       tags:
@@ -239,6 +303,18 @@ paths:
             enum: [ FILE, DIRECTORY ]
           description: Тип объекта
 
+        - name: depth
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [ Current, All ]
+            default: Current
+          description: |
+            Глубина поиска:
+            - Current — только на текущем уровне директории
+            - All — рекурсивно во всех вложенных директориях
+
       responses:
         '200':
           description: Результаты поиска
@@ -254,8 +330,126 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Invalid server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/storage/download:
+    get:
+      tags: [ Storage ]
+      security:
+        - bearerAuth: [ ]
+      summary: Скачать файл
+      parameters:
+        - name: path
+          in: query
+          required: true
+          schema:
+            type: string
+          example: MONT/2025/image.png
+      responses:
+        '200':
+          description: Файл
+          content:
+            application/file:
+              schema:
+                type: string
+                format: binary
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Invalid server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/storage/download/zip:
+    post:
+      tags:
+        - Storage
+      security:
+        - bearerAuth: [ ]
+      summary: Скачать файлы и директории в zip архиве
+      description: |
+        Скачивание списка файлов и/или директорий с сохранением структуры.
+        Если передана директория — скачивается всё её содержимое рекурсивно.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - paths
+              properties:
+                paths:
+                  type: array
+                  items:
+                    type: string
+                  description: Пути к файлам и директориям в хранилище
+                  example:
+                    - MONT/2025/Севак/
+                    - MONT/2025/image.png
+      responses:
+        '200':
+          description: ZIP архив с файлами
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Invalid server
           content:
             application/json:
               schema:
@@ -351,7 +545,7 @@ components:
       properties:
         code:
           type: integer
-          example: 404
+          example: status_code
         message:
           type: string
           example: Object not found
